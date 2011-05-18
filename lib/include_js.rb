@@ -1,7 +1,9 @@
-require 'v8'  
-module IncludeJs
+require 'v8'
+
+module IncludeJS
   @root_path = File.expand_path('.')
-  @modules = {} # This stores all loaded modules by their absolute path (not their id)  
+  @modules = {} # This stores all loaded modules by their absolute path (not their id)
+  @cxt = V8::Context.new
   
   class << self
     attr_accessor :root_path # FIXME Make this act like a PATH (see Modules 1.1 require.paths) and think about the API
@@ -25,13 +27,12 @@ module IncludeJs
     def load_module(module_id, globals, caller_path)
       path = absolute_path(module_id, caller_path)
       return @modules[path] if @modules[path]
+      globals.each { |name, value| @cxt[name] = value } # FIXME Remove. globals is just hax to make the tests pass
+      exports = @modules[path] = @cxt['Object'].new
+      require_fn = lambda { |module_id| load_module(module_id, globals, path) }
       
-      cxt = V8::Context.new # FIXME I have a strong feeling that there should be only one Context for every environment
-      globals.each { |name, value| cxt[name] = value }
-      cxt['require'] = lambda { |module_id| load_module(module_id, globals, path) }
-      cxt['exports'] = {}
-      exports = @modules[path] = cxt['exports'] # This is to make monkeying with a module work while it gets loaded
-      cxt.load(path)
+      context = @cxt.eval("(function(exports, require){ #{File.read(path)}})")
+      context.call(exports, require_fn)
       exports
     end
     
@@ -39,7 +40,7 @@ module IncludeJs
       root = (module_id.start_with?('.') && caller_path) ? File.dirname(caller_path) : @root_path
       File.expand_path("#{root}/#{module_id}.js")
     end
-    
+        
   end
   
 end
