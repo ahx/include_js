@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    include_js (0.0.1)
+    include_js (0.1.0)
       therubyracer (~> 0.8.1)
 
 GEM

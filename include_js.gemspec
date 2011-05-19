@@ -11,8 +11,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Andreas Haller", "Thorben Schröder"]
   s.email       = ["andreashaller@gmail.com"]
   s.homepage    = "https://github.com/ahx/include_js"
-  s.summary     = %q{CommonJS Modules in Ruby}
-  s.description = %q{Use CommonJS Modules inside Ruby via therubyracer}
+  s.summary     = %q{Load CommonJS Modules into Ruby}
+  s.description = %q{Load CommonJS Modules into Ruby via therubyracer}
 
   s.rubyforge_project = "include_js"
   

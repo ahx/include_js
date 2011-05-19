@@ -1,6 +1,6 @@
 # IncludeJS
 
-This is an experiment to see if we can use CommonJS Modules inside Ruby.
+Load CommonJS Modules into Ruby.
 
 Currently it supports the [CommonJS Modules 1.0 spec](http://www.commonjs.org/specs/modules/1.0/).
 
