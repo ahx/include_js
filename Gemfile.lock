@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    include_js (0.0.1)
+      therubyracer (~> 0.8.1)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -16,5 +22,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  rspec
-  therubyracer
+  include_js!
+  rspec (~> 2.6.0)
