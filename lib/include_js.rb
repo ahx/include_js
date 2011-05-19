@@ -43,7 +43,7 @@ module IncludeJS
       exports = @modules[path] = @engine['Object'].new
       require_fn = lambda { |module_id| load_module(module_id, globals, path) }
       
-      context = @engine.eval("(function(exports, require){ #{File.read(path)}})")
+      context = @engine.eval("(function(exports, require){ #{File.read(path)}})", path)
       context.call(exports, require_fn)
       exports
     end
