@@ -39,11 +39,12 @@ module IncludeJS
     def load_module(module_id, globals, caller_path)
       path = absolute_path(module_id, caller_path)
       return @modules[path] if @modules[path]
+      source = File.read(path) # Fails louldly if file does not exist
       globals.each { |name, value| @engine[name] = value } # FIXME Remove. globals is just hax to make the tests pass
       exports = @modules[path] = @engine['Object'].new
       require_fn = lambda { |module_id| load_module(module_id, globals, path) }
       
-      context = @engine.eval("(function(exports, require){ #{File.read(path)}})", path)
+      context = @engine.eval("(function(exports, require){ #{source}})", path)
       context.call(exports, require_fn)
       exports
     end
