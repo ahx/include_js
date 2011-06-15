@@ -4,7 +4,7 @@ require 'forwardable'
 module IncludeJS  
   class << self
     extend Forwardable
-    def_delegators :instance, :require, :module, :root_path, :root_path=
+    def_delegators :instance, :engine, :module, :require, :root_path, :root_path=
   end
     
   def self.instance
@@ -13,6 +13,7 @@ module IncludeJS
   
   class Env
     attr_accessor :root_path # FIXME Make this act like a PATH (see Modules 1.1 require.paths) and think about the API
+    attr_reader :engine
     
     def initialize
       @root_path = File.expand_path('.')
@@ -20,8 +21,8 @@ module IncludeJS
       @engine = V8::Context.new
     end
     
-    def require(module_id, globals={})
-      load_module(module_id, globals, nil)
+    def require(module_id)
+      load_module(module_id, nil)
     end
     
     def module(module_id)
@@ -36,13 +37,12 @@ module IncludeJS
     
     protected
     
-    def load_module(module_id, globals, caller_path)
+    def load_module(module_id, caller_path)
       path = absolute_path(module_id, caller_path)
       return @modules[path] if @modules[path]
       source = File.read(path) # Fails louldly if file does not exist
-      globals.each { |name, value| @engine[name] = value } # FIXME Remove. globals is just hax to make the tests pass
       exports = @modules[path] = @engine['Object'].new
-      require_fn = lambda { |module_id| load_module(module_id, globals, path) }
+      require_fn = lambda { |module_id| load_module(module_id, path) }
       
       context = @engine.eval("(function(exports, require){ #{source}})", path)
       context.call(exports, require_fn)
