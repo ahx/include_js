@@ -4,7 +4,7 @@ require 'forwardable'
 module IncludeJS  
   class << self
     extend Forwardable
-    def_delegators :instance, :engine, :module, :require, :root_path, :root_path=
+    def_delegators :instance, :engine, :module, :modules, :require, :root_path, :root_path=
   end
     
   def self.instance
@@ -13,7 +13,7 @@ module IncludeJS
   
   class Env
     attr_accessor :root_path # FIXME Make this act like a PATH (see Modules 1.1 require.paths) and think about the API
-    attr_reader :engine
+    attr_reader :engine, :modules
     
     def initialize
       @root_path = File.expand_path('.')
@@ -39,13 +39,13 @@ module IncludeJS
     
     def load_module(module_id, caller_path)
       path = absolute_path(module_id, caller_path)
-      return @modules[path] if @modules[path]
+      key = module_id.start_with?('.') ? path.chomp(File.extname(path)) : module_id
+      return @modules[key] if @modules[key]
       source = File.read(path) # Fails louldly if file does not exist
-      exports = @modules[path] = @engine['Object'].new
-      require_fn = lambda { |module_id| load_module(module_id, path) }
+      exports = @modules[key] = @engine['Object'].new
       
       context = @engine.eval("(function(exports, require){ #{source}})", path)
-      context.call(exports, require_fn)
+      context.call(exports, lambda { |module_id| load_module(module_id, path) })
       exports
     end
     

@@ -7,13 +7,11 @@ describe IncludeJS do
   end
   
   describe "require" do
-    it "can load a CommonJS module" do      
+    it "can load a CommonJS module" do
       test_module = IncludeJS.require('test_module')
-      path = File.expand_path(File.join(@root, 'test_module.js'))
-      IncludeJS.instance.instance_eval('@modules')[path].should be_true # truthy      
       act_like_test(test_module)
     end
-    
+        
     it "ignores nonexistent files" do
       js = IncludeJS::Env.new
       js.root_path = @root
@@ -21,6 +19,23 @@ describe IncludeJS do
         js.require('nonexistent')
       }.should raise_error(Errno::ENOENT)
       js.instance_eval('@modules').keys.should be_empty
+    end
+  end
+  
+  describe "modules" do
+    it "returns modules by their id" do
+      id = 'test_module'
+      test_module = IncludeJS.require(id)
+      IncludeJS.modules[id].should be_true # truthy      
+      act_like_test(test_module)
+    end
+    
+    it "returns nested loaded modules by their absolute path (without extension)" do
+      test_module = IncludeJS.require('test_module')
+      path = File.expand_path(File.join(@root, 'test_sub_module'))
+      IncludeJS.modules.keys.should include(path)
+      multi = IncludeJS.modules[path].should be_true
+      multi.multiply(2, 2).should == 4
     end
   end
   
