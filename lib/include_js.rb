@@ -17,7 +17,7 @@ module IncludeJS
     
     def initialize
       @root_path = File.expand_path('.')
-      @modules = {} # This stores all loaded modules by their absolute path (not their id)
+      @modules = {}
       @engine = V8::Context.new
     end
     
