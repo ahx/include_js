@@ -15,9 +15,9 @@ Gem::Specification.new do |s|
   s.description = %q{Load CommonJS Modules into Ruby via therubyracer}
 
   s.rubyforge_project = "include_js"
-  
-  s.add_dependency 'therubyracer', '~> 0.8.1'
-  
+
+  s.add_dependency 'therubyracer', '>= 0.9.2'
+
   s.add_development_dependency 'rspec', '~> 2.6.0'
 
   s.files         = `git ls-files`.split("\n")
